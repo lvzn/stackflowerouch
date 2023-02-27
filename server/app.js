@@ -6,12 +6,14 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require("mongoose")
 var cors = require("cors")
+const jwt = require("jsonwebtoken")
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiRouter = require('./routes/api');
 
 var app = express();
+
 
 mongoose.connect(process.env.DB_URL)
 mongoose.Promise = Promise

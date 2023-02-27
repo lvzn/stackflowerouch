@@ -1,19 +1,21 @@
 var express = require('express');
 var User = require("../models/User")
 const { body, validationResult } = require('express-validator')
+const jwt = require("jsonwebtoken")
 const bcrypt = require('bcryptjs')
 var router = express.Router();
 
 
-/* GET users listing. */
 router.post('/register', body('username').isEmail(), body('password').isLength({ min: 3 }), function (req, res, next) {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() })
   }
+  console.log(req.body)
   User.findOne({
     username: req.body.username,
   }).then((user) => {
+
     if (!user) {
       User.create({
         username: req.body.username,
@@ -34,7 +36,28 @@ router.post('/login', function (req, res, next) {
         return res.json({ msg: "User not found" })
       }
       else {
-        bcrypt.compareSync(req.body.password, user.password) ? res.json({ msg: "logged in" }) : res.json({ msg: "Wrong password" })
+        bcrypt.compare(req.body.password, user.password, (err, isMatch) => {
+          if (err) throw err;
+          if (isMatch) {
+            const jwtPayload = {
+              id: user._id,
+              username: user.username
+            }
+            jwt.sign(
+              jwtPayload,
+              process.env.SECRET,
+              {
+                expiresIn: 120
+              },
+              (err, token) => {
+                res.json({
+                  msg: "Login successful",
+                  token: token
+                })
+              }
+            )
+          }
+        })
       }
     })
 })
