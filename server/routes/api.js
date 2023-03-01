@@ -13,7 +13,7 @@ router.get('/post', (req, res, next) => {
 })
 
 router.get('/post/:id', (req, res, next) => {
-    Post.find({ _id: req.params.id }).then(post => {
+    Post.findOne({ _id: req.params.id }).then(post => {
         if (!post) return res.status(404).send("No post found")
         else return res.json(post)
     })

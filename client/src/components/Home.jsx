@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import Container from '@mui/material/Container'
 import TextField from '@mui/material/TextField'
 import { Stack } from '@mui/system'
@@ -73,7 +74,7 @@ function Home() {
         <Container maxWidth="lg" >
 
             {items.map(item => {
-                return (<ListItem item={item} />)
+                return (<ListItem key={item._id} item={item} />)
             })}
             {alert ? <Alert severity='error'>{alertContent}</Alert> : <></>}
             <TextField
@@ -103,14 +104,15 @@ function ListItem(props) {
     const [voted, setVoted] = useState(false);
     const [votes, setVotes] = useState(props.item.votes);
     const initialVotes = votes
-    console.log(props.item.text)
+
     return (
         <>
             <Card variant='outlined'>
                 <CardContent>{props.item.username} posts:</CardContent>
-                <CardContent>{props.item.text}</CardContent>
+                <Typography align={"left"} variant="body1" color="initial"><CardContent><pre>{props.item.text}</pre></CardContent></Typography>
+
                 <CardActions >
-                    <Button size='small'>comments</Button>
+                    <Button component={Link} to={'/post/' + props.item._id} size='small'>comments</Button>
                     <IconButton color='inherit' onClick={() => {
                         setVoted(!voted)
                         voted ? setVotes(initialVotes - 1) : setVotes(initialVotes + 1)

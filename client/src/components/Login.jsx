@@ -41,9 +41,6 @@ function Login() {
                     onChange={e => setPassword(e.target.value)}
 
                 />
-                {/* <input type={"email"} id="username" onChange={(e) => setEmail(e.target.value)} />
-                <input type={"password"} id="password" onChange={(e) => setPassword(e.target.value)} />
-                <input type={"submit"} id="submit" /> */}
                 <Button variant="contained" color="primary" onClick={(e) => handleSubmit(e)}>
                     Login
                 </Button>

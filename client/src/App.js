@@ -3,6 +3,7 @@ import './App.css';
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+import Post from './components/Post';
 import { BrowserRouter as Router, Link, Routes, Route } from "react-router-dom"
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
@@ -27,6 +28,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
+          <Route path='/post/:id' element={<Post />} />
         </Routes>
 
       </div>
