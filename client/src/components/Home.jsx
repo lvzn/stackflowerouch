@@ -5,21 +5,21 @@ import Container from '@mui/material/Container'
 import TextField from '@mui/material/TextField'
 import { Stack } from '@mui/system'
 import { Button, CardActions, CardContent, IconButton, Typography } from '@mui/material';
-import { Grid } from '@mui/material'
 import { Alert } from '@mui/material'
 import { Card } from '@mui/material'
 import { Favorite, FavoriteBorder } from '@mui/icons-material'
 
 
 function Home() {
-    const [text, setText] = useState("");
-    const [alert, setAlert] = useState(false);
-    const [alertContent, setAlertContent] = useState("");
-    const [items, setItems] = useState([]);
-    const [updateStates, setUpdateStates] = useState({ updateStates: [] });
-    const [update, setUpdate] = useState(false);
-    const authToken = localStorage.getItem("authToken")
+    const [text, setText] = useState(""); //text state for posting content
+    const [alert, setAlert] = useState(false); //alert state for the application to know when to show alerts
+    const [alertContent, setAlertContent] = useState(""); //state for application to set alert content from e.g. api response
+    const [items, setItems] = useState([]); // state for application to fetch the posts from api to
+    const [updateStates, setUpdateStates] = useState({ updateStates: [] }); //state for app to fetch vote data from api to
+    const [update, setUpdate] = useState(false); //state for application to update post data when user creates a new post
+    const authToken = localStorage.getItem("authToken") //retrieve auth token from localstorage
 
+    //load posts and vote data from database through api
     useEffect(() => {
         let ignore = false
         if (ignore) return;
@@ -38,13 +38,13 @@ function Home() {
         return () => {
             ignore = true
         };
-    }, [update, authToken]);
+    }, [update, authToken]); //when a change is made to update state, run this again
 
-
+    //function for sending post content to database
     function submitPost(e) {
 
         e.preventDefault()
-
+        //show alert if user has no auth token
         if (!authToken) {
             setAlertContent("Please log in first")
             setAlert(true)
@@ -68,6 +68,7 @@ function Home() {
 
     }
 
+    //function that lets user type tab characters into the post field
     function handleTab(e) {
         const { value } = e.target
         if (e.key === 'Tab') {
@@ -88,10 +89,11 @@ function Home() {
         <Container maxWidth="xl" sx={{ alignContent: "left" }} >
 
             <Stack spacing={2} sx={{ m: "2rem" }}>
+                {/* map items that were set in useEffect to show on the page */}
                 {items.map(item => {
                     return (<ListItem key={item._id} item={item} updateStates={updateStates} />)
                 })}
-
+                {/* show alert when alert state is set to true */}
                 {alert ? <Alert severity='error'>{alertContent}</Alert> : <></>}
                 <Stack direction={'row'} sx={{ s: 1 }} spacing={2}>
                     <TextField
@@ -118,13 +120,16 @@ function Home() {
     )
 }
 
+// another component for the posts
 function ListItem(props) {
     const authToken = localStorage.getItem('authToken')
+
+    //states for handling the number and status of votes
     const [voted, setVoted] = useState(false);
     const [votes, setVotes] = useState(props.item.votes);
 
 
-
+    //useEffect for updating the values of votes based on data fetched in the main component
     useEffect(() => {
         let ignore = false
         if (ignore) return
@@ -138,6 +143,9 @@ function ListItem(props) {
         };
     }, [props]);
 
+    //function for sending user votes to the database through api
+    //api has separate routes for adding a vote and removing one, so two different cases are needed
+    //with better backend code this couldve been avoided but it is what it is now
     function sendVote() {
         voted ?
             fetch(`/api/unvote`, {
@@ -172,6 +180,7 @@ function ListItem(props) {
                 <CardActions >
                     <Button component={Link} to={'/post/' + props.item._id} size='small'>comments</Button>
                     <IconButton color='inherit' onClick={() => {
+                        // send votes to api and change vote button style
                         setVoted(!voted)
                         sendVote()
                         voted ? setVotes(initialVotes - 1) : setVotes(initialVotes + 1)

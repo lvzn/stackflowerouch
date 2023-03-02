@@ -5,18 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Post from './components/Post';
 import { BrowserRouter as Router, Link, Routes, Route } from "react-router-dom"
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import Menu from '@mui/icons-material/Menu'
 import Appbar from './components/Appbar';
-
-
-
-
-
 
 function App() {
   return (

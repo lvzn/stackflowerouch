@@ -2,26 +2,26 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 import Container from '@mui/material/Container'
-import { Card, CardContent, CardActions, IconButton, Typography, TextField, Alert, Button, Stack } from '@mui/material';
+import { Card, CardContent, CardActions, IconButton, Typography, TextField, Button, Stack } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material'
 
 function Post(props) {
     const authToken = localStorage.getItem('authToken')
 
-    const params = useParams()
+    const params = useParams() //get url parameters from react router to get post id 
     const postId = params.id
-    const [voted, setVoted] = useState(false);
-    const [text, setText] = useState("");
-    const [votes, setVotes] = useState(props.votes);
-    const [post, setPost] = useState([]);
-    const [comments, setComments] = useState([]);
-    const [alert, setAlert] = useState(false);
-    const [update, setUpdate] = useState(false);
-    const [updateStates, setUpdateStates] = useState({ posts: [] });
+    const [voted, setVoted] = useState(false); //votestate, similar to one in home component
+    const [text, setText] = useState(""); //text state, similar to one in home component
+    const [votes, setVotes] = useState(props.votes); //votes state, similar to one in home component
+    const [post, setPost] = useState([]); //post state for loading the post from api to
+    const [comments, setComments] = useState([]); //comments state for loading the comments from api to
+    const [alert, setAlert] = useState(false); //similar to one in home component, this component doesn't implement the use of alerts yet though
+    const [update, setUpdate] = useState(false); //update state similar to one in home component
+    const [updateStates, setUpdateStates] = useState({ posts: [] }); //similar to state with same name in home component
     const [alertContent, setAlertContent] = useState("");
     let initialVotes = votes
 
-
+    //useEffect for loading post, comments and votes of user
     useEffect(() => {
         let ignore = false
         if (ignore) return;
@@ -55,6 +55,7 @@ function Post(props) {
 
     }, [update, authToken]);
 
+    //useEffect for updating votes on screen based on api data
     useEffect(() => {
         if (updateStates.posts !== undefined) {
 
@@ -67,6 +68,7 @@ function Post(props) {
         };
     }, [updateStates]);
 
+    //similar to one in home component
     function handleTab(e) {
         const { value } = e.target
         if (e.key === 'Tab') {
@@ -81,6 +83,7 @@ function Post(props) {
         }
     }
 
+    //similar to one in home component, but posts to different route in api
     function postComment(e) {
         e.preventDefault()
         const authToken = localStorage.getItem("authToken")
@@ -106,6 +109,7 @@ function Post(props) {
         setUpdate(!update)
     }
 
+    //similar to one in home component
     function sendVote() {
         voted ?
             fetch(`/api/unvote`, {
@@ -129,6 +133,7 @@ function Post(props) {
                 .then(res => res.json()).then(msg => console.log(msg))
     }
 
+    //post layout containing single post and mapping the comments for it
     return (
         <>
             <Container maxWidth="xl">
@@ -184,12 +189,14 @@ function Post(props) {
     )
 }
 
+//subcomponent rendering each comment to the app
 function Comment({ comment, updateStates }) {
     const authToken = localStorage.getItem('authToken')
     const [voted, setVoted] = useState(false);
     const [votes, setVotes] = useState(comment.votes);
     let initialVotes = votes
 
+    //similar to one in home component, but sends comment votes instead
     function sendVote() {
         voted ?
             fetch(`/api/unvote`, {
@@ -213,6 +220,7 @@ function Comment({ comment, updateStates }) {
                 .then(res => res.json()).then(msg => console.log(msg))
     }
 
+    //update votes of comments based on api data
     useEffect(() => {
         if (updateStates.comments !== undefined) {
             if (updateStates.comments.includes(comment._id)) {

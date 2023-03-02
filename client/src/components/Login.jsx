@@ -8,6 +8,7 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    //function to handle login
     function handleSubmit(e) {
         e.preventDefault()
         fetch("/users/login", {
@@ -19,7 +20,7 @@ function Login() {
 
         })
             .then(res => res.json())
-            .then(data => localStorage.setItem('authToken', data.token))
+            .then(data => localStorage.setItem('authToken', data.token)) // set token received from api to localstorage to preserve session
     }
 
     return (

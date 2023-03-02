@@ -6,6 +6,7 @@ function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    //function to handle register
     function handleSubmit(e) {
         e.preventDefault()
         fetch("/users/register", {
