@@ -16,6 +16,9 @@ function Home() {
     const [alert, setAlert] = useState(false);
     const [alertContent, setAlertContent] = useState("");
     const [items, setItems] = useState([]);
+    const [updateStates, setUpdateStates] = useState({ updateStates: [] });
+    const [update, setUpdate] = useState(false);
+    const authToken = localStorage.getItem("authToken")
 
     useEffect(() => {
         let ignore = false
@@ -23,15 +26,25 @@ function Home() {
         fetch('/api/post')
             .then(res => res.json())
             .then(data => setItems(data))
+        if (authToken) {
+            fetch('/api/vote', {
+                headers: {
+                    "authorization": "Bearer " + authToken
+                }
+            })
+                .then(res => res.json())
+                .then(data => setUpdateStates(data))
+        }
         return () => {
             ignore = true
         };
-    }, []);
+    }, [update, authToken]);
+
 
     function submitPost(e) {
 
         e.preventDefault()
-        const authToken = localStorage.getItem("authToken")
+
         if (!authToken) {
             setAlertContent("Please log in first")
             setAlert(true)
@@ -51,6 +64,7 @@ function Home() {
                 setAlertContent(data)
                 setAlert(true)
             })
+        setUpdate(!update)
 
     }
 
@@ -71,38 +85,82 @@ function Home() {
 
 
     return (
-        <Container maxWidth="lg" >
+        <Container maxWidth="xl" sx={{ alignContent: "left" }} >
 
-            {items.map(item => {
-                return (<ListItem key={item._id} item={item} />)
-            })}
-            {alert ? <Alert severity='error'>{alertContent}</Alert> : <></>}
-            <TextField
-                onKeyDown={e => handleTab(e)}
-                id="post"
-                label="Create a new post"
-                variant="outlined"
-                color="primary"
-                margin="none"
-                fullWidth
-                sizes="large"
-                multiline
-                onChange={(e) => setText(e.target.value)}
-            />
-            <Grid>
+            <Stack spacing={2} sx={{ m: "2rem" }}>
+                {items.map(item => {
+                    return (<ListItem key={item._id} item={item} updateStates={updateStates} />)
+                })}
 
-                <Button variant="contained" color="primary" onClick={submitPost}>
-                    Post
-                </Button>
+                {alert ? <Alert severity='error'>{alertContent}</Alert> : <></>}
+                <Stack direction={'row'} sx={{ s: 1 }} spacing={2}>
+                    <TextField
+                        onKeyDown={e => handleTab(e)}
+                        id="post"
+                        label="Create a new post"
+                        variant="outlined"
+                        color="primary"
+                        margin="none"
+                        fullWidth
+                        sizes="large"
+                        multiline
+                        onChange={(e) => setText(e.target.value)}
+                    />
 
-            </Grid>
+
+                    <Button variant="contained" color="primary" onClick={submitPost}>
+                        Post
+                    </Button>
+                </Stack>
+            </Stack>
+
         </Container>
     )
 }
 
 function ListItem(props) {
+    const authToken = localStorage.getItem('authToken')
     const [voted, setVoted] = useState(false);
     const [votes, setVotes] = useState(props.item.votes);
+
+
+
+    useEffect(() => {
+        let ignore = false
+        if (ignore) return
+        if (props.updateStates !== null && props.updateStates.posts !== undefined) {
+            if (props.updateStates.posts.includes(props.item._id)) {
+                setVoted(true)
+            }
+        }
+        return () => {
+            ignore = true
+        };
+    }, [props]);
+
+    function sendVote() {
+        voted ?
+            fetch(`/api/unvote`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                    "authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ post: props.item._id })
+            })
+                .then(res => res.json()).then(msg => console.log(msg))
+            :
+            fetch(`/api/vote`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                    "authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ post: props.item._id })
+            })
+                .then(res => res.json()).then(msg => console.log(msg))
+    }
+
     const initialVotes = votes
 
     return (
@@ -115,6 +173,7 @@ function ListItem(props) {
                     <Button component={Link} to={'/post/' + props.item._id} size='small'>comments</Button>
                     <IconButton color='inherit' onClick={() => {
                         setVoted(!voted)
+                        sendVote()
                         voted ? setVotes(initialVotes - 1) : setVotes(initialVotes + 1)
                         return
                     }} >

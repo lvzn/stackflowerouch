@@ -16,7 +16,6 @@ function Register() {
             body: JSON.stringify({ username: email, password: password })
 
         })
-            .then(data => console.log(data))
     }
 
     return (

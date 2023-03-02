@@ -2,10 +2,12 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 import Container from '@mui/material/Container'
-import { Card, CardContent, CardActions, IconButton, Typography, TextField, Alert, Button } from '@mui/material';
+import { Card, CardContent, CardActions, IconButton, Typography, TextField, Alert, Button, Stack } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material'
 
 function Post(props) {
+    const authToken = localStorage.getItem('authToken')
+
     const params = useParams()
     const postId = params.id
     const [voted, setVoted] = useState(false);
@@ -14,6 +16,8 @@ function Post(props) {
     const [post, setPost] = useState([]);
     const [comments, setComments] = useState([]);
     const [alert, setAlert] = useState(false);
+    const [update, setUpdate] = useState(false);
+    const [updateStates, setUpdateStates] = useState({ posts: [] });
     const [alertContent, setAlertContent] = useState("");
     let initialVotes = votes
 
@@ -31,10 +35,37 @@ function Post(props) {
         fetch(`/api/comments/${postId}`)
             .then(res => res.json())
             .then(data => setComments(data))
+
+        if (authToken) {
+            fetch('/api/vote', {
+                headers: {
+                    "authorization": "Bearer " + authToken
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setUpdateStates(data)
+
+                })
+        }
+
         return () => {
             ignore = true
         };
-    }, [postId]);
+
+    }, [update, authToken]);
+
+    useEffect(() => {
+        if (updateStates.posts !== undefined) {
+
+            if (updateStates.posts.includes(post._id)) {
+                setVoted(true)
+            }
+        }
+        return () => {
+
+        };
+    }, [updateStates]);
 
     function handleTab(e) {
         const { value } = e.target
@@ -72,59 +103,127 @@ function Post(props) {
                 setAlertContent(data)
                 setAlert(true)
             })
+        setUpdate(!update)
+    }
 
+    function sendVote() {
+        voted ?
+            fetch(`/api/unvote`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                    "authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ post: post._id })
+            })
+                .then(res => res.json()).then(msg => console.log(msg))
+            :
+            fetch(`/api/vote`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                    "authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ post: post._id })
+            })
+                .then(res => res.json()).then(msg => console.log(msg))
     }
 
     return (
         <>
-            < Container maxWidth="lg" >
-                <Card variant='outlined'>
-                    <CardContent>{post.username} posts:</CardContent>
-                    <Typography align={"left"} variant="body1" color="initial"><CardContent>
-                        <pre>{post.text}</pre></CardContent>
-                    </Typography>
-                    <CardActions >
-                        <IconButton color='inherit' onClick={() => {
-                            setVoted(!voted)
-                            voted ? setVotes(initialVotes - 1) : setVotes(initialVotes + 1)
-                            return
-                        }} >
-                            {voted ? <Favorite /> : <FavoriteBorder />}
-                        </IconButton>
-                        <Typography variant="body2" color="initial">{votes}</Typography>
-                    </CardActions>
-                </Card>
-            </ Container>
-            <Container maxWidth="md">
-                {
-                    comments.map(comment =>
-                        (<Comment key={comment._id} comment={comment} />))
-                }
-                <TextField
-                    onKeyDown={e => handleTab(e)}
-                    id="post"
-                    label="Comment on this post"
-                    variant="outlined"
-                    color="primary"
-                    margin="none"
-                    fullWidth
-                    sizes="large"
-                    multiline
-                    onChange={(e) => setText(e.target.value)}
-                />
-                <Button variant="contained" color="primary" onClick={postComment}>
-                    Post comment
-                </Button>
-            </Container>
+            <Container maxWidth="xl">
+                < Container maxWidth="lg" sx={{ marginTop: 2 }}  >
 
+                    <Card variant='outlined'>
+                        <CardContent>{post.username} posts:</CardContent>
+                        <Typography align={"left"} variant="body1" color="initial"><CardContent>
+                            <pre>{post.text}</pre></CardContent>
+                        </Typography>
+                        <CardActions >
+                            <IconButton color='inherit' onClick={() => {
+                                sendVote()
+                                setVoted(!voted)
+                                voted ? setVotes(initialVotes - 1) : setVotes(initialVotes + 1)
+                                return
+                            }} >
+                                {voted ? <Favorite /> : <FavoriteBorder />}
+                            </IconButton>
+                            <Typography variant="body2" color="initial">{votes}</Typography>
+                        </CardActions>
+                    </Card>
+                </ Container>
+                <Container maxWidth="md" sx={{ marginTop: 2, marginBottom: 2 }}>
+                    <Stack spacing={2}>
+                        {
+                            comments.map(comment =>
+                                (<Comment key={comment._id} comment={comment} updateStates={updateStates} />))
+                        }
+                        <Stack direction={"row"} spacing={2}>
+                            <TextField
+                                onKeyDown={e => handleTab(e)}
+                                id="post"
+                                label="Comment on this post"
+                                variant="outlined"
+                                color="primary"
+                                margin="none"
+                                fullWidth
+                                sizes="large"
+                                multiline
+                                onChange={(e) => setText(e.target.value)}
+                            />
+                            <Button variant="contained" color="primary" onClick={(e) => {
+                                postComment(e)
+                            }}>
+                                comment
+                            </Button>
+                        </Stack>
+                    </Stack>
+                </Container>
+            </Container>
         </>
     )
 }
 
-function Comment({ comment }) {
+function Comment({ comment, updateStates }) {
+    const authToken = localStorage.getItem('authToken')
     const [voted, setVoted] = useState(false);
     const [votes, setVotes] = useState(comment.votes);
     let initialVotes = votes
+
+    function sendVote() {
+        voted ?
+            fetch(`/api/unvote`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                    "authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ comment: comment._id })
+            })
+                .then(res => res.json()).then(msg => console.log(msg))
+            :
+            fetch(`/api/vote`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                    "authorization": "Bearer " + authToken
+                },
+                body: JSON.stringify({ comment: comment._id })
+            })
+                .then(res => res.json()).then(msg => console.log(msg))
+    }
+
+    useEffect(() => {
+        if (updateStates.comments !== undefined) {
+            if (updateStates.comments.includes(comment._id)) {
+                setVoted(true)
+            }
+        }
+        return () => {
+
+        };
+    }, [updateStates]);
+
     return (
         <Card variant='outlined'>
             <CardContent>{comment.username} comments:</CardContent>
@@ -133,6 +232,7 @@ function Comment({ comment }) {
             </CardContent></Typography>
             <CardActions>
                 <IconButton color='inherit' onClick={() => {
+                    sendVote()
                     setVoted(!voted)
                     voted ? setVotes(initialVotes - 1) : setVotes(initialVotes + 1)
                     return

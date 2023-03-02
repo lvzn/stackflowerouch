@@ -22,7 +22,6 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {/* <ResponsiveAppBar /> */}
         <Appbar />
         <Routes>
           <Route path='/' element={<Home />} />
