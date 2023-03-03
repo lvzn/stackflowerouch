@@ -7,12 +7,14 @@ const Post = require("../models/Post")
 const Comment = require('../models/Comment');
 const Vote = require('../models/Vote');
 
+//return all posts for home page
 router.get('/post', (req, res, next) => {
     Post.find({}).then(posts => {
         res.send(posts)
     })
 })
 
+//return specific post based on id
 router.get('/post/:id', (req, res, next) => {
     Post.findOne({ _id: req.params.id }).then(post => {
         if (!post) return res.status(404).send("No post found")
@@ -20,6 +22,7 @@ router.get('/post/:id', (req, res, next) => {
     })
 })
 
+//return comments for a specific post
 router.get('/comments/:id', (req, res, next) => {
     Comment.find({ post: req.params.id }).then(comments => {
         if (!comments) return res.status(404).send("No comments for that post.")
@@ -27,6 +30,7 @@ router.get('/comments/:id', (req, res, next) => {
     })
 })
 
+//post a comment to database, requires validation
 router.post('/comment', validateToken, (req, res, next) => {
     Comment.create({
         post: req.body.post,
@@ -39,6 +43,7 @@ router.post('/comment', validateToken, (req, res, next) => {
     })
 })
 
+//create a post to database, requires validation
 router.post('/post', validateToken, (req, res, next) => {
     Post.create({
         user: req.user.id,
@@ -51,6 +56,7 @@ router.post('/post', validateToken, (req, res, next) => {
     })
 })
 
+//vote a post up, requires validation
 router.post('/vote', validateToken, (req, res, next) => {
     Vote.findOne({ user: req.user.id }).then(vote => {
         if (!vote) {
@@ -85,6 +91,7 @@ router.post('/vote', validateToken, (req, res, next) => {
     res.json("Vote saved successfully")
 })
 
+//vote a post down, requires validation
 router.post('/unvote', validateToken, (req, res, next) => {
     Vote.findOne({ user: req.user.id }).then(vote => {
         let posts = vote.posts
@@ -108,6 +115,7 @@ router.post('/unvote', validateToken, (req, res, next) => {
     res.json("Vote saved successfully")
 })
 
+//get votes of a specific user based on authorization token
 router.get('/vote', validateToken, (req, res, next) => {
     Vote.findOne({ user: req.user.id }).then(votes => {
         return res.json(votes)

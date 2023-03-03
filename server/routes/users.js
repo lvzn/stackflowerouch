@@ -6,12 +6,12 @@ const bcrypt = require('bcryptjs')
 var router = express.Router();
 
 
-router.post('/register', body('username').isEmail(), body('password').isLength({ min: 3 }), function (req, res, next) {
+router.post('/register', body('username').isEmail(), body('password').isLength({ min: 3 }), function (req, res, next) { //validate email and password fulfill requirements
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() })
   }
-  console.log(req.body)
+  //create new user if one by the same name doesnt already exist
   User.findOne({
     username: req.body.username,
   }).then((user) => {
@@ -30,6 +30,7 @@ router.post('/register', body('username').isEmail(), body('password').isLength({
 });
 
 router.post('/login', function (req, res, next) {
+  //find the user in question and assign them a token they can then use auth routes with
   User.findOne({ username: req.body.username })
     .then((user) => {
       if (!user) {
