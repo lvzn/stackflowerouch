@@ -65,3 +65,4 @@ React has been used in implementing the system +5p
 
 Voting has been implemented, though it's more of a like feature, but it's similar in essence +3p
 
+In total 34-35p
