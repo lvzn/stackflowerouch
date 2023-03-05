@@ -95,7 +95,7 @@ function Home() {
                 })}
                 {/* show alert when alert state is set to true */}
                 {alert ? <Alert severity='error'>{alertContent}</Alert> : <></>}
-                <Stack direction={'row'} sx={{ s: 1 }} spacing={2}>
+                <Stack direction={'column'} sx={{ s: 1 }} spacing={2}>
                     <TextField
                         onKeyDown={e => handleTab(e)}
                         id="post"
@@ -175,8 +175,9 @@ function ListItem(props) {
         <>
             <Card variant='outlined'>
                 <CardContent>{props.item.username} posts:</CardContent>
-                <Typography align={"left"} variant="body1" color="initial"><CardContent><pre>{props.item.text}</pre></CardContent></Typography>
-
+                <div style={{ justifyContent: "flex-end" }}>
+                    <Typography style={{ wordWrap: "break-word" }} align={"left"} variant="body1" sx={{ whiteSpace: "pre-wrap" }} noWrap={false} color="initial"><CardContent>{props.item.text}</CardContent></Typography>
+                </div>
                 <CardActions >
                     <Button component={Link} to={'/post/' + props.item._id} size='small'>comments</Button>
                     <IconButton color='inherit' onClick={() => {

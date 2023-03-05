@@ -140,10 +140,11 @@ function Post(props) {
                 < Container maxWidth="lg" sx={{ marginTop: 2 }}  >
 
                     <Card variant='outlined'>
-                        <CardContent>{post.username} posts:</CardContent>
-                        <Typography align={"left"} variant="body1" color="initial"><CardContent>
-                            <pre>{post.text}</pre></CardContent>
-                        </Typography>
+                        <CardContent>{post.username} posts:
+                            <Typography whiteSpace={"pre-wrap"} align={"left"} variant="body1" color="initial">
+                                {post.text}
+                            </Typography>
+                        </CardContent>
                         <CardActions >
                             <IconButton color='inherit' onClick={() => {
                                 sendVote()
