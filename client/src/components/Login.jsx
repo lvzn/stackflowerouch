@@ -1,8 +1,6 @@
 import React from 'react'
 import { useState } from 'react';
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-
+import { Stack, Button, TextField, Container, Typography } from '@mui/material';
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -25,27 +23,30 @@ function Login() {
 
     return (
         <>
-            <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    id="username"
-                    label="Username"
-                    type={"email"}
-                    onChange={e => setEmail(e.target.value)}
 
-                />
-                <TextField
-                    id="Password"
-                    label="Password"
-                    variant="outlined"
-                    type='password'
-                    onChange={e => setPassword(e.target.value)}
+            <Container maxWidth={"sm"} sx={{ mt: 2 }}>
+                <Stack direction={"column"} spacing={2}>
+                    <Typography variant='h2'>Login</Typography>
+                    <TextField
+                        id="username"
+                        label="Username"
+                        type={"email"}
+                        onChange={e => setEmail(e.target.value)}
 
-                />
-                <Button variant="contained" color="primary" onClick={(e) => handleSubmit(e)}>
-                    Login
-                </Button>
-            </form>
+                    />
+                    <TextField
+                        id="Password"
+                        label="Password"
+                        variant="outlined"
+                        type='password'
+                        onChange={e => setPassword(e.target.value)}
+
+                    />
+                    <Button variant="contained" color="primary" onClick={(e) => handleSubmit(e)}>
+                        Login
+                    </Button>
+                </Stack>
+            </Container>
         </>
     )
 }

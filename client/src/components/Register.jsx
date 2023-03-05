@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import { TextField, Button } from '@mui/material';
+import { Stack, Button, TextField, Container, Typography } from '@mui/material';
 
 function Register() {
     const [email, setEmail] = useState("");
@@ -21,27 +21,30 @@ function Register() {
 
     return (
         <>
-            <h1>Register</h1>
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    id="username"
-                    label="Username"
-                    type={"email"}
-                    onChange={e => setEmail(e.target.value)}
+            <Container sx={{ mt: 2 }} maxWidth={"sm"}>
+                <Stack spacing={2}>
+                    <Typography variant='h2'>Register</Typography>
 
-                />
-                <TextField
-                    id="Password"
-                    label="Password"
-                    variant="outlined"
-                    type='password'
-                    onChange={e => setPassword(e.target.value)}
+                    <TextField
+                        id="username"
+                        label="Username"
+                        type={"email"}
+                        onChange={e => setEmail(e.target.value)}
 
-                />
-                <Button variant="contained" color="primary" onClick={(e) => handleSubmit(e)}>
-                    Register
-                </Button>
-            </form>
+                    />
+                    <TextField
+                        id="Password"
+                        label="Password"
+                        variant="outlined"
+                        type='password'
+                        onChange={e => setPassword(e.target.value)}
+
+                    />
+                    <Button variant="contained" color="primary" onClick={(e) => handleSubmit(e)}>
+                        Register
+                    </Button>
+                </Stack>
+            </Container>
         </>
     )
 }

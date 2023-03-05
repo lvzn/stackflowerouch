@@ -63,5 +63,6 @@ According to the requirements, password salting and hashing wasn't mandatory, so
 
 React has been used in implementing the system +5p
 
-Voting has been implemented, though it's more of a like feature, but it's similar in essence +3p
+Voting has been implemented, but I misunderstood the requirement mentioned in the doc so it's more of a "like feature". It is similar in essence so +2-3p 
 
+In total 33-35 points
